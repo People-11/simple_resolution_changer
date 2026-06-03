@@ -12,127 +12,141 @@ import (
 )
 
 var (
-	user32 = syscall.NewLazyDLL("user32.dll")
+	user32   = syscall.NewLazyDLL("user32.dll")
 	kernel32 = syscall.NewLazyDLL("kernel32.dll")
-	shcore = syscall.NewLazyDLL("shcore.dll")
-	gdi32 = syscall.NewLazyDLL("gdi32.dll")
+	shcore   = syscall.NewLazyDLL("shcore.dll")
+	gdi32    = syscall.NewLazyDLL("gdi32.dll")
+	shell32  = syscall.NewLazyDLL("shell32.dll")
+	advapi32 = syscall.NewLazyDLL("advapi32.dll")
 	// API functions
-	procCreateWindowEx = user32.NewProc("CreateWindowExW")
-	procDefWindowProc = user32.NewProc("DefWindowProcW")
-	procRegisterClassEx = user32.NewProc("RegisterClassExW")
-	procGetMessage = user32.NewProc("GetMessageW")
-	procTranslateMessage = user32.NewProc("TranslateMessage")
-	procDispatchMessage = user32.NewProc("DispatchMessageW")
-	procPostQuitMessage = user32.NewProc("PostQuitMessage")
-	procGetModuleHandle = kernel32.NewProc("GetModuleHandleW")
-	procLoadCursor = user32.NewProc("LoadCursorW")
-	procGetStockObject = gdi32.NewProc("GetStockObject")
-	procEnumWindows = user32.NewProc("EnumWindows")
-	procGetWindowText = user32.NewProc("GetWindowTextW")
-	procGetWindowTextLength = user32.NewProc("GetWindowTextLengthW")
-	procIsWindowVisible = user32.NewProc("IsWindowVisible")
-	procGetWindowLong = user32.NewProc("GetWindowLongW")
-	procSetWindowLong = user32.NewProc("SetWindowLongW")
-	procSetWindowPos = user32.NewProc("SetWindowPos")
+	procCreateWindowEx         = user32.NewProc("CreateWindowExW")
+	procDefWindowProc          = user32.NewProc("DefWindowProcW")
+	procRegisterClassEx        = user32.NewProc("RegisterClassExW")
+	procGetMessage             = user32.NewProc("GetMessageW")
+	procTranslateMessage       = user32.NewProc("TranslateMessage")
+	procDispatchMessage        = user32.NewProc("DispatchMessageW")
+	procPostQuitMessage        = user32.NewProc("PostQuitMessage")
+	procGetModuleHandle        = kernel32.NewProc("GetModuleHandleW")
+	procGetCurrentProcess      = kernel32.NewProc("GetCurrentProcess")
+	procLoadCursor             = user32.NewProc("LoadCursorW")
+	procGetStockObject         = gdi32.NewProc("GetStockObject")
+	procCreateFont             = gdi32.NewProc("CreateFontW")
+	procEnumWindows            = user32.NewProc("EnumWindows")
+	procGetWindowText          = user32.NewProc("GetWindowTextW")
+	procGetWindowTextLength    = user32.NewProc("GetWindowTextLengthW")
+	procIsWindowVisible        = user32.NewProc("IsWindowVisible")
+	procGetWindowLong          = user32.NewProc("GetWindowLongW")
+	procSetWindowLong          = user32.NewProc("SetWindowLongW")
+	procSetWindowPos           = user32.NewProc("SetWindowPos")
 	procSetProcessDpiAwareness = shcore.NewProc("SetProcessDpiAwareness")
-	procGetSystemMetrics = user32.NewProc("GetSystemMetrics")
-	procSendMessage = user32.NewProc("SendMessageW")
-	procMessageBox = user32.NewProc("MessageBoxW")
-	procSetWindowText = user32.NewProc("SetWindowTextW")
-	procPostMessage = user32.NewProc("PostMessageW")
-	procEnumDisplayMonitors = user32.NewProc("EnumDisplayMonitors")
-	procGetMonitorInfo = user32.NewProc("GetMonitorInfoW")
+	procSendMessage            = user32.NewProc("SendMessageW")
+	procMessageBox             = user32.NewProc("MessageBoxW")
+	procSetWindowText          = user32.NewProc("SetWindowTextW")
+	procPostMessage            = user32.NewProc("PostMessageW")
+	procEnumDisplayMonitors    = user32.NewProc("EnumDisplayMonitors")
+	procGetMonitorInfo         = user32.NewProc("GetMonitorInfoW")
+	procShellExecute           = shell32.NewProc("ShellExecuteW")
+	procOpenProcessToken       = advapi32.NewProc("OpenProcessToken")
+	procGetTokenInformation    = advapi32.NewProc("GetTokenInformation")
+	procCloseHandle            = kernel32.NewProc("CloseHandle")
 )
 
 const (
 	WS_OVERLAPPEDWINDOW = 0x00CF0000
-	WS_VISIBLE = 0x10000000
-	WS_CHILD = 0x40000000
-	WS_TABSTOP = 0x00010000
-	WS_CAPTION = 0x00C00000
-	WS_THICKFRAME = 0x00040000
-	WS_BORDER = 0x00800000
-	SWP_SHOWWINDOW = 0x0040
-	WM_DESTROY = 0x0002
-	WM_COMMAND = 0x0111
-	WM_CLOSE = 0x0010
-	CB_ADDSTRING = 0x0143
-	CB_GETCURSEL = 0x0147
-	CB_RESETCONTENT = 0x014B
-	CB_SETCURSEL = 0x014E
-	BM_GETCHECK = 0x00F0
-	BM_SETCHECK = 0x00F1
-	BST_CHECKED = 0x0001
-	CBS_DROPDOWNLIST = 0x0003
-	BS_PUSHBUTTON = 0x0000
-	BS_AUTOCHECKBOX = 0x0003
-	ES_LEFT = 0x0000
-	WHITE_BRUSH = 0
-	IDC_ARROW = 32512
-	SM_CXSCREEN = 0
-	SM_CYSCREEN = 1
-	BN_CLICKED = 0
-	GWL_STYLE = -16
-	ID_WINDOW_COMBO = 1001
-	ID_MONITOR_COMBO = 1002
-	ID_WIDTH_EDIT = 1003
-	ID_HEIGHT_EDIT = 1004
+	WS_VISIBLE          = 0x10000000
+	WS_CHILD            = 0x40000000
+	WS_TABSTOP          = 0x00010000
+	WS_CAPTION          = 0x00C00000
+	WS_THICKFRAME       = 0x00040000
+	WS_BORDER           = 0x00800000
+	SWP_SHOWWINDOW      = 0x0040
+	WM_DESTROY          = 0x0002
+	WM_COMMAND          = 0x0111
+	WM_CLOSE            = 0x0010
+	WM_SETFONT          = 0x0030
+	CB_ADDSTRING        = 0x0143
+	CB_GETCURSEL        = 0x0147
+	CB_RESETCONTENT     = 0x014B
+	CB_SETCURSEL        = 0x014E
+	BM_GETCHECK         = 0x00F0
+	BM_SETCHECK         = 0x00F1
+	BST_CHECKED         = 0x0001
+	CBS_DROPDOWNLIST    = 0x0003
+	BS_PUSHBUTTON       = 0x0000
+	BS_AUTOCHECKBOX     = 0x0003
+	ES_LEFT             = 0x0000
+	WHITE_BRUSH         = 0
+	IDC_ARROW           = 32512
+	DEFAULT_CHARSET     = 1
+	CLIP_DEFAULT_PRECIS = 0
+	CLEARTYPE_QUALITY   = 5
+	DEFAULT_PITCH       = 0
+	BN_CLICKED          = 0
+	GWL_STYLE           = -16
+	ID_WINDOW_COMBO     = 1001
+	ID_MONITOR_COMBO    = 1002
+	ID_WIDTH_EDIT       = 1003
+	ID_HEIGHT_EDIT      = 1004
 	ID_BORDERLESS_CHECK = 1005
-	ID_REFRESH_BTN = 1006
-	ID_RESIZE_BTN = 1007
+	ID_REFRESH_BTN      = 1006
+	ID_RESIZE_BTN       = 1007
 	WM_APP_REFRESH_DONE = 0x8001
+	TOKEN_QUERY         = 0x0008
+	TokenElevation      = 20
+	SW_SHOWNORMAL       = 1
 )
 
 type (
 	WNDCLASSEX struct {
-		CbSize, Style uint32
-		LpfnWndProc uintptr
-		CbClsExtra, CbWndExtra int32
+		CbSize, Style                            uint32
+		LpfnWndProc                              uintptr
+		CbClsExtra, CbWndExtra                   int32
 		HInstance, HIcon, HCursor, HbrBackground uintptr
-		LpszMenuName, LpszClassName *uint16
-		HIconSm uintptr
+		LpszMenuName, LpszClassName              *uint16
+		HIconSm                                  uintptr
 	}
 	MSG struct {
-		Hwnd uintptr
-		Message uint32
+		Hwnd           uintptr
+		Message        uint32
 		WParam, LParam uintptr
-		Time uint32
-		Pt struct{ X, Y int32 }
+		Time           uint32
+		Pt             struct{ X, Y int32 }
 	}
 	WindowInfo struct {
 		Handle uintptr
-		Title string
+		Title  string
 	}
-	RECT struct{ Left, Top, Right, Bottom int32 }
+	RECT        struct{ Left, Top, Right, Bottom int32 }
 	MONITORINFO struct {
-		CbSize uint32
+		CbSize            uint32
 		RcMonitor, RcWork RECT
-		DwFlags uint32
+		DwFlags           uint32
 	}
-	MonitorInfo struct{ Index, Width, Height int }
-	Config      struct {
-		Width      string `json:"width"`
-		Height     string `json:"height"`
-		Monitor    string `json:"monitor"`
+	MonitorInfo     struct{ Index, Left, Top, Width, Height int }
+	TOKEN_ELEVATION struct{ TokenIsElevated uint32 }
+	Config          struct {
+		Width       string `json:"width"`
+		Height      string `json:"height"`
+		Monitor     string `json:"monitor"`
 		WindowTitle string `json:"window_title"`
-		Borderless bool   `json:"borderless"`
+		Borderless  bool   `json:"borderless"`
 	}
 )
 
 var (
-	windows                                               []WindowInfo
-	monitors                                              []MonitorInfo
+	windows                                                []WindowInfo
+	monitors                                               []MonitorInfo
 	mainWindow, windowComboBox, monitorComboBox, widthEdit uintptr
-	heightEdit, borderlessCheck, hInstance                uintptr
-	configFile                                            string
-	isRefreshing                                          bool
-	windowsLock                                           sync.Mutex
-	lastSavedMonitor, lastSavedWindow                     string
+	heightEdit, borderlessCheck, hInstance                 uintptr
+	uiFont, titleFont                                      uintptr
+	configFile                                             string
+	isRefreshing                                           bool
+	windowsLock                                            sync.Mutex
+	lastSavedMonitor, lastSavedWindow                      string
 )
 
 func initConfigPath() {
-	dir, _ := os.UserConfigDir() // 默认返回 AppData\Roaming
-	// 或者使用 os.Getenv("LOCALAPPDATA") 获取 AppData\Local
+	dir, _ := os.UserConfigDir()
 	if local := os.Getenv("LOCALAPPDATA"); local != "" {
 		dir = local
 	}
@@ -151,14 +165,38 @@ func sendMsg(hwnd uintptr, msg uint32, wp, lp uintptr) uintptr {
 	return ret
 }
 
+func createFont(face string) uintptr {
+	font, _, _ := procCreateFont.Call(
+		uintptr(^uint32(15)+1), 0, 0, 0, 400, 0, 0, 0,
+		DEFAULT_CHARSET, 0, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH,
+		u16(face),
+	)
+	return font
+}
+
+func createControl(class, text string, style, x, y, w, h, id, font uintptr) uintptr {
+	hwnd, _, _ := procCreateWindowEx.Call(0, u16(class), u16(text), style, x, y, w, h, mainWindow, id, hInstance, 0)
+	if hwnd != 0 && font != 0 {
+		sendMsg(hwnd, WM_SETFONT, font, 1)
+	}
+	return hwnd
+}
+
 func saveConfig(width, height, monitor, windowTitle string, borderless bool) {
-	if data, err := json.MarshalIndent(Config{width, height, monitor, windowTitle, borderless}, "", "  "); err == nil {
+	cfg := Config{
+		Width:       width,
+		Height:      height,
+		Monitor:     monitor,
+		WindowTitle: windowTitle,
+		Borderless:  borderless,
+	}
+	if data, err := json.MarshalIndent(cfg, "", "  "); err == nil {
 		os.WriteFile(configFile, data, 0644)
 	}
 }
 
 func loadConfig() (c Config) {
-	c = Config{"800", "600", "Monitor 1", "", true}
+	c = Config{Width: "800", Height: "600", Monitor: "Monitor 1", Borderless: true}
 	if data, err := os.ReadFile(configFile); err == nil {
 		json.Unmarshal(data, &c)
 	}
@@ -167,6 +205,35 @@ func loadConfig() (c Config) {
 
 func showError(msg string) {
 	procMessageBox.Call(mainWindow, u16(msg), u16("Error"), 0x30)
+}
+
+func isRunningAsAdmin() bool {
+	var token uintptr
+	process, _, _ := procGetCurrentProcess.Call()
+	if r, _, _ := procOpenProcessToken.Call(process, TOKEN_QUERY, uintptr(unsafe.Pointer(&token))); r == 0 {
+		return false
+	}
+	defer procCloseHandle.Call(token)
+
+	var elevation TOKEN_ELEVATION
+	var returned uint32
+	if r, _, _ := procGetTokenInformation.Call(token, TokenElevation, uintptr(unsafe.Pointer(&elevation)), unsafe.Sizeof(elevation), uintptr(unsafe.Pointer(&returned))); r == 0 {
+		return false
+	}
+	return elevation.TokenIsElevated != 0
+}
+
+func relaunchAsAdmin() bool {
+	exe, err := os.Executable()
+	if err != nil {
+		return false
+	}
+	r, _, _ := procShellExecute.Call(0, u16("runas"), u16(exe), 0, 0, SW_SHOWNORMAL)
+	return r > 32
+}
+
+func requireAdmin() bool {
+	return isRunningAsAdmin() || !relaunchAsAdmin()
 }
 
 func setText(hwnd uintptr, text string) {
@@ -189,7 +256,13 @@ func getMonitorInfo() (res []MonitorInfo) {
 		var mi MONITORINFO
 		mi.CbSize = uint32(unsafe.Sizeof(mi))
 		if r, _, _ := procGetMonitorInfo.Call(h, uintptr(unsafe.Pointer(&mi))); r != 0 {
-			res = append(res, MonitorInfo{idx + 1, int(mi.RcMonitor.Right - mi.RcMonitor.Left), int(mi.RcMonitor.Bottom - mi.RcMonitor.Top)})
+			res = append(res, MonitorInfo{
+				Index:  idx + 1,
+				Left:   int(mi.RcMonitor.Left),
+				Top:    int(mi.RcMonitor.Top),
+				Width:  int(mi.RcMonitor.Right - mi.RcMonitor.Left),
+				Height: int(mi.RcMonitor.Bottom - mi.RcMonitor.Top),
+			})
 		}
 		idx++
 		return 1
@@ -217,11 +290,11 @@ func updateUILists() {
 	monitors = getMonitorInfo()
 	sel := 0
 	for i, m := range monitors {
-		name := fmt.Sprintf("Monitor %d (%dx%d)", m.Index, m.Width, m.Height)
-		if fmt.Sprintf("Monitor %d", m.Index) == lastSavedMonitor {
+		monitorName := fmt.Sprintf("Monitor %d", m.Index)
+		if monitorName == lastSavedMonitor {
 			sel = i
 		}
-		sendMsg(monitorComboBox, CB_ADDSTRING, 0, u16(name))
+		sendMsg(monitorComboBox, CB_ADDSTRING, 0, u16(fmt.Sprintf("%s (%dx%d)", monitorName, m.Width, m.Height)))
 	}
 	if len(monitors) > 0 {
 		sendMsg(monitorComboBox, CB_SETCURSEL, uintptr(sel), 0)
@@ -266,12 +339,12 @@ func performResize() {
 	wStr, hStr := getText(widthEdit), getText(heightEdit)
 	w, errW := strconv.Atoi(wStr)
 	h, errH := strconv.Atoi(hStr)
-	if winIdx < 0 || winIdx >= len(local) || monIdx < 0 || errW != nil || errH != nil || w <= 0 || h <= 0 {
+	if winIdx < 0 || winIdx >= len(local) || monIdx < 0 || monIdx >= len(monitors) || errW != nil || errH != nil || w <= 0 || h <= 0 {
 		showError("Invalid selection or dimensions.")
 		return
 	}
 	hwnd, title, b := local[winIdx].Handle, local[winIdx].Title, sendMsg(borderlessCheck, BM_GETCHECK, 0, 0) == BST_CHECKED
-	
+
 	// If the handle is invalid, auto-refresh and try to find it by title
 	if v, _, _ := procIsWindowVisible.Call(hwnd); v == 0 {
 		newList := getWindows()
@@ -294,8 +367,8 @@ func performResize() {
 		}
 	}
 
-	sw, _, _ := procGetSystemMetrics.Call(SM_CXSCREEN)
-	sh, _, _ := procGetSystemMetrics.Call(SM_CYSCREEN)
+	monitor := monitors[monIdx]
+	x, y := monitor.Left+(monitor.Width-w)/2, monitor.Top+(monitor.Height-h)/2
 	style, _, _ := procGetWindowLong.Call(hwnd, ^uintptr(15))
 	if b {
 		style &^= (WS_CAPTION | WS_THICKFRAME)
@@ -303,8 +376,8 @@ func performResize() {
 		style |= (WS_CAPTION | WS_THICKFRAME)
 	}
 	procSetWindowLong.Call(hwnd, ^uintptr(15), style)
-	if r, _, _ := procSetWindowPos.Call(hwnd, 0, uintptr((int(sw)-w)/2), uintptr((int(sh)-h)/2), uintptr(w), uintptr(h), SWP_SHOWWINDOW); r != 0 {
-		lastSavedMonitor = fmt.Sprintf("Monitor %d", monIdx+1)
+	if r, _, _ := procSetWindowPos.Call(hwnd, 0, uintptr(x), uintptr(y), uintptr(w), uintptr(h), SWP_SHOWWINDOW); r != 0 {
+		lastSavedMonitor = fmt.Sprintf("Monitor %d", monitor.Index)
 		lastSavedWindow = title
 		saveConfig(wStr, hStr, lastSavedMonitor, lastSavedWindow, b)
 	} else {
@@ -334,21 +407,24 @@ func wndProc(hwnd, msg, wp, lp uintptr) uintptr {
 }
 
 func createControls() {
-	procCreateWindowEx.Call(0, u16("STATIC"), u16("Target Window:"), WS_VISIBLE|WS_CHILD, 20, 20, 150, 30, mainWindow, 0, hInstance, 0)
-	windowComboBox, _, _ = procCreateWindowEx.Call(0, u16("COMBOBOX"), 0, WS_VISIBLE|WS_CHILD|WS_TABSTOP|CBS_DROPDOWNLIST, 20, 55, 460, 250, mainWindow, ID_WINDOW_COMBO, hInstance, 0)
-	procCreateWindowEx.Call(0, u16("STATIC"), u16("Target Monitor:"), WS_VISIBLE|WS_CHILD, 20, 105, 150, 30, mainWindow, 0, hInstance, 0)
-	monitorComboBox, _, _ = procCreateWindowEx.Call(0, u16("COMBOBOX"), 0, WS_VISIBLE|WS_CHILD|WS_TABSTOP|CBS_DROPDOWNLIST, 20, 140, 460, 250, mainWindow, ID_MONITOR_COMBO, hInstance, 0)
-	procCreateWindowEx.Call(0, u16("BUTTON"), u16("Refresh Lists"), WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_PUSHBUTTON, 20, 190, 150, 40, mainWindow, ID_REFRESH_BTN, hInstance, 0)
-	procCreateWindowEx.Call(0, u16("STATIC"), u16("Width:"), WS_VISIBLE|WS_CHILD, 20, 250, 80, 30, mainWindow, 0, hInstance, 0)
-	widthEdit, _, _ = procCreateWindowEx.Call(0, u16("EDIT"), 0, WS_VISIBLE|WS_CHILD|WS_TABSTOP|WS_BORDER|ES_LEFT, 110, 248, 120, 30, mainWindow, ID_WIDTH_EDIT, hInstance, 0)
-	procCreateWindowEx.Call(0, u16("STATIC"), u16("Height:"), WS_VISIBLE|WS_CHILD, 260, 250, 80, 30, mainWindow, 0, hInstance, 0)
-	heightEdit, _, _ = procCreateWindowEx.Call(0, u16("EDIT"), 0, WS_VISIBLE|WS_CHILD|WS_TABSTOP|WS_BORDER|ES_LEFT, 350, 248, 120, 30, mainWindow, ID_HEIGHT_EDIT, hInstance, 0)
-	borderlessCheck, _, _ = procCreateWindowEx.Call(0, u16("BUTTON"), u16("Borderless"), WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_AUTOCHECKBOX, 20, 300, 150, 30, mainWindow, ID_BORDERLESS_CHECK, hInstance, 0)
-	procCreateWindowEx.Call(0, u16("BUTTON"), u16("Resize Window"), WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_PUSHBUTTON, 20, 350, 180, 40, mainWindow, ID_RESIZE_BTN, hInstance, 0)
+	createControl("STATIC", "Target Window:", WS_VISIBLE|WS_CHILD, 20, 20, 150, 30, 0, uiFont)
+	windowComboBox = createControl("COMBOBOX", "", WS_VISIBLE|WS_CHILD|WS_TABSTOP|CBS_DROPDOWNLIST, 20, 55, 460, 250, ID_WINDOW_COMBO, titleFont)
+	createControl("STATIC", "Target Monitor:", WS_VISIBLE|WS_CHILD, 20, 105, 150, 30, 0, uiFont)
+	monitorComboBox = createControl("COMBOBOX", "", WS_VISIBLE|WS_CHILD|WS_TABSTOP|CBS_DROPDOWNLIST, 20, 140, 460, 250, ID_MONITOR_COMBO, uiFont)
+	createControl("BUTTON", "Refresh Lists", WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_PUSHBUTTON, 20, 190, 150, 40, ID_REFRESH_BTN, uiFont)
+	createControl("STATIC", "Width:", WS_VISIBLE|WS_CHILD, 20, 250, 80, 30, 0, uiFont)
+	widthEdit = createControl("EDIT", "", WS_VISIBLE|WS_CHILD|WS_TABSTOP|WS_BORDER|ES_LEFT, 110, 248, 120, 30, ID_WIDTH_EDIT, uiFont)
+	createControl("STATIC", "Height:", WS_VISIBLE|WS_CHILD, 260, 250, 80, 30, 0, uiFont)
+	heightEdit = createControl("EDIT", "", WS_VISIBLE|WS_CHILD|WS_TABSTOP|WS_BORDER|ES_LEFT, 350, 248, 120, 30, ID_HEIGHT_EDIT, uiFont)
+	borderlessCheck = createControl("BUTTON", "Borderless", WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_AUTOCHECKBOX, 20, 300, 150, 30, ID_BORDERLESS_CHECK, uiFont)
+	createControl("BUTTON", "Resize Window", WS_VISIBLE|WS_CHILD|WS_TABSTOP|BS_PUSHBUTTON, 20, 350, 180, 40, ID_RESIZE_BTN, uiFont)
 }
 
 func main() {
 	runtime.LockOSThread()
+	if !requireAdmin() {
+		return
+	}
 	initConfigPath()
 	procSetProcessDpiAwareness.Call(1)
 	hInstance, _, _ = procGetModuleHandle.Call(0)
@@ -365,13 +441,17 @@ func main() {
 	if mainWindow == 0 {
 		return
 	}
+	uiFont = createFont("Segoe UI")
+	titleFont = createFont("Segoe UI Symbol")
 	createControls()
 	cfg := loadConfig()
 	lastSavedMonitor = cfg.Monitor
 	lastSavedWindow = cfg.WindowTitle
 	setText(widthEdit, cfg.Width)
 	setText(heightEdit, cfg.Height)
-	sendMsg(borderlessCheck, BM_SETCHECK, uintptr(map[bool]int{true: BST_CHECKED, false: 0}[cfg.Borderless]), 0)
+	if cfg.Borderless {
+		sendMsg(borderlessCheck, BM_SETCHECK, BST_CHECKED, 0)
+	}
 	go refreshLists()
 	var msg MSG
 	for {
